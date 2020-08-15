@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>订单管理</title>
+<link rel="stylesheet" type="text/css"
+	href="easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+<script type="text/javascript" src="easyui/jquery.min.js"></script>
+<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="easyui/locale/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="easyui/ajaxfileupload.js"></script>
+<script type="text/javascript" src="../js/axios.min.js"></script>
+<script type="text/javascript" src="backjs/order.js"></script>
+
+<script type="text/javascript">
+
+	//格式化图片
+	function fmtImg(value, row, index) {
+		if( value.indexOf("/")!=0){
+			//不以 / 开头的图片
+			return "<img height='100px' src='../"+value+"'>";
+		}else{
+			//以 / 开头的图片（自己上传的图片）
+			return "<img height='100px' src='"+value+"'>";
+		}
+		
+	}
+	
+	//显示订单状态
+	function showState(value, row, index) {
+		switch(value){
+		case 0:
+			return '未支付';
+		case 1:
+			return "<button onclick='sendPro(" + index + ")'>发货</button>";
+		case 2:
+			return '已发货';
+		case 3:
+			return '已收货';
+		case 4:
+			return '已评价';
+		case 5:
+			return '已退货';
+		}
+	}
+
+	//格式化日期
+	function fmtDate(date) {
+		var y = date.getFullYear();
+		var m = date.getMonth() + 1;
+		var d = date.getDate();
+		return y + "-" + m + "-" + d;
+	}
+
+	//操作字段的格式化方法
+	function fmtOp(value, row, index) {
+		//在表格中使用easyui的button按钮比较复杂，在这里使用原生的button
+		return "<button onclick='openadd(" + index + ")'>修改</button>";
+	}
+
+	
+	//查询
+	function query() {
+		console.log("name="+$("#name").textbox('getValue'));
+		console.log("id="+$("#id").textbox('getValue'));
+		$('#dg').datagrid('load', {
+			name : $("#name").textbox('getValue'),
+			id : $("#id").textbox('getValue'),
+		})
+	}
+
+	
+	//清空name，press，date 三个输入框
+	function reset(){
+		 $("#id").textbox('setValue',"");
+		 $("#name").textbox('setValue',"");
+	}
+	
+	//发货
+	function sendPro(index){
+		if(index !=undefined){
+			var rows=$('#dg').datagrid("getRows");
+			var id=rows[index].id;
+			var url="../bkorder.do";
+			axios.get(url,{
+				params:{
+					oid:id,
+					op:'sendPro'
+				}
+			}).then(res=>{
+				alert(res.data.msg);
+				if(res.data.code==1){
+					location.href="order.html";
+				}
+		});
+			
+		}
+	}
+	
+	
+</script>
+</head>
+<body>
+	
+
+	<div class="easyui-layout" data-options="fit:true">
+		<div data-options="region:'north'" style="height: 32px">
+			<!-- prompt='书名'==data-options="prompt:'书名'" -->
+			<input class="easyui-textbox" label="订单号：" labelAlign='right' 
+				style="width: 200px" id="id"> 
+			<input class="easyui-textbox" label="收货人：" labelAlign='right' 
+				style="width: 200px" id="name"> 
+			<a  href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"
+				onclick="query()">query</a>
+			<a  href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload'"
+				onclick="reset()">reset</a>
+			
+		</div>
+		
+		<div
+			data-options="region:'center',title:'query result',iconCls:'icon-ok'">
+			<table class="easyui-datagrid" id="dg"
+				data-options="
+				url:'../bkorder.do?op=query',
+				method:'get',
+				border:false,
+				singleSelect:true,
+				fit:true,
+				fitColumns:true,
+				pagination:true">
+				<thead>
+					<tr>
+						<th data-options="field:'id',width:80,align:'center'">订单号</th>
+						<th data-options="field:'name',width:100,align:'center'">收货人</th>
+						<th data-options="field:'addr',width:100,align:'center'">收货地址</th>
+						<th data-options="field:'phone',width:100,align:'center'">联系方式</th>
+						<th data-options="field:'createtime',width:100,align:'center'">创建时间</th>
+						<th data-options="field:'state',width:80,align:'center',formatter:showState">订单状态</th>
+						<!-- 使用一个不存在的字段名 就能看到按钮 -->
+						<th 
+						data-options="
+						field:'idd',
+						width:40,
+						formatter:fmtOp,
+						align:'center'">操作</th>
+						
+						
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+
+	<!--订单修改窗口 -->
+	<div id="dialogmodify" class="easyui-dialog" title="修改"
+		style="width: 400px; height: 450px;"
+		data-options="
+    	  iconCls:'icon-save',
+    	  resizable:true,
+    	  modal:true,
+    	  closed:true,
+    	  buttons:'#foradd'">
+		<form action="#" id="modifyform" enctype="multipart/form-data" 
+			style="margin:0 auto;width: 300px;">
+			<input class="easyui-textbox" name="id" id="id" label="订单号"><br>
+			<input class="easyui-textbox" name="name" label="名称"><br>
+			<input class="easyui-textbox" name="phone" label="联系方式"><br>
+			<input class="easyui-textbox" multiline="true" 
+			style="width: 250px;height: 60px; " name="addr" label="描述"><br>
+		</form>
+
+	</div>
+	<div id="foradd">
+		<a href="#" class="easyui-linkbutton" onclick="add()">保存</a> 
+		<a href="#" class="easyui-linkbutton" onclick="canceladd()">取消</a>
+	</div>
+	
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<link href="css/common.css" rel="stylesheet" type="text/css"/>
+<link href="css/product.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/axios.min.js"></script>
+	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/comp.js"></script>
+
+	<title>大麦商城</title>
+</head>
+<body>
+
+<div class="container header">
+	
+<div class="span5">
+		<div class="logo">
+			<a href="index.html">
+				<img src="image/r___________renleipic_01/logo.png" alt="依依不舍"/>
+			</a>
+		</div>
+	</div>
+	<div class="span9">
+<div class="headerAd">
+	<img src="image/header.jpg" width="320" height="50" alt="正品保障" title="正品保障"/>
+</div>	</div>
+<div class="span10 last">
+		<div class="topNav clearfix">
+			<ul id="loginUser">
+
+
+				<li v-if="loginUser.cname" id="headerLogin" class="headerLogin" style="display: list-item;">
+					<a href="login.html">我:{{loginUser.cname}}</a>|
+				</li>
+				<li v-else id="headerLogins" class="headerLogin" style="display: list-item;">
+					<a href="login.html">登录</a>|
+				</li>
+				<li id="headerRegister" class="headerRegister" style="display: list-item;">
+					<a href="reg.html">注册</a>|
+				</li>
+				<li id="headerLogin1" class="headerLogin" style="display: list-item;">
+						<a href="olist.html">我的订单</a>|
+				</li>
+				<li id="headerlogout1" class="headerRegister" style="display: list-item;">
+				<a  @click="logout">退出</a>|
+				</li>
+				
+				
+				<li id="headerUsername" class="headerUsername"></li>
+				<li id="headerLogout" class="headerLogout">
+					<a>[退出]</a>|
+				</li>
+						<li>
+							<a href="personal.html">会员中心</a>
+							|
+						</li>
+						
+						<li>
+							<a>关于我们</a>
+							
+						</li>
+			</ul>
+			<script type="text/javascript">
+				var user= new Vue({
+					el:"#loginUser",
+					data:{
+						loginUser:{}
+					},
+					created:function () {
+						axios({
+							url:"user.do?op=getUser",
+						}).then((res)=>{
+							this.loginUser=res.data;
+							console.info(this.loginUser)
+						})
+					},
+					methods:{
+						logout(){
+							axios({
+								url:"user.do?op=logout"
+							}).then((res)=>{
+								alert(res.data.msg)
+								if (res.data.code){
+									 location.href="login.html";
+								}
+							})
+						}
+					}
+				})
+			</script>
+		</div>
+		<div class="cart">
+			<a  href="cart.html">购物车</a>
+		</div>
+			<div class="phone">
+				客服热线:
+				<strong>96008/53277764</strong>
+			</div>
+	</div>
+	
+
+
+<!-- 顶部的导航 -->
+<div id="mainNav" class="span24">
+	<ul class="mainNav">
+		<li>
+			<a href="index.html">首页</a>|
+	    </li>
+				
+		<li v-for="fc in firstCategory">
+			<a @click="switchCategory(fc.id)"  >{{fc.cname}}</a>|
+		</li>
+				
+	</ul>
+</div>
+	<!-- 顶部的导航js代码 -->
+	<script type="text/javascript">
+		var vue2=new Vue({
+			el:"#mainNav",
+			data:{
+				firstCategory:[], //顶部的一级分类导航 
+			},
+			created:function(){
+				var url="category.do";
+				//查询一级分类导航
+				axios({
+					method:'get',
+					params:{
+						op:'queryByFirstCat'
+					},
+					url:url
+					
+				}).then(res=>{
+					this.firstCategory=res.data.list;
+					console.info("firstCategory:"+this.firstCategory);
+				});
+			},
+			methods:{
+				//选择其他商品分类，刷新页面
+				switchCategory(id){
+					console.info("switchCategory()的id:"+id);
+					location.href= 'clist.html#'+id;
+				}
+			}
+			
+		});
+	</script>
+	<!-- 顶部的导航js代码结束 -->
+</div>
+<!-- 顶部的结束 -->
+
+<div class="container productContent">
+<!-- 左侧导航 开始-->
+	<div class="span6">
+		  <div id="secNav" class="hotProductCategory">
+				<dl v-for="s in secondCategory">
+					<!-- 一级分类 -->
+					<dt>
+						<a  @click="switchCategory(s.firstCat.id)">{{s.firstCat.cname}}</a>
+					</dt>
+					<!-- 二级分类 -->
+					<dd v-for="sc in s.secondCat">
+						<a   @click="switchCategory(sc.secid)" >{{sc.seccname}}</a>
+					</dd>
+					
+				</dl>
+		 </div>
+		
+		  <!-- 左侧导航js代码 -->
+		 <script type="text/javascript">
+		 
+		 var currentFircname=''; //当前一级分类
+		 var vue3=new Vue({
+				el:"#secNav",
+				data:{
+					secondCategory:[], //顶部的一级分类导航 
+				},
+				created:function(){
+					var url="category.do";
+					//查询一级分类导航
+					axios({
+						method:'get',
+						params:{
+							op:'queryBySecondCat'
+						},
+						url:url
+						
+					}).then(res=>{
+						this.secondCategory=res.data;
+						console.info(this.secondCategory);
+					});
+				},
+				methods:{
+					
+					switchCategory(id){
+						console.info("switchCategory()的id:"+id);
+						location.href= 'clist.html#'+id;
+					}
+				}
+			});
+		 </script>
+		  <!-- 左侧导航js代码结束 -->
+	</div>
+	<!-- 左侧导航结束 -->	
+
+	
+		<div class="span18 last" >
+			
+			<div class="productImage">
+					<a title="" style="outline-style: none; text-decoration: none;" id="zoom" href="http://image/r___________renleipic_01/bigPic1ea8f1c9-8b8e-4262-8ca9-690912434692.jpg" rel="gallery">
+						<div class="zoomPad"><img style="opacity: 1;" title="" class="medium" :src="product.image"><div style="display: block; top: 0px; left: 162px; width: 0px; height: 0px; position: absolute; border-width: 1px;" class="zoomPup"></div><div style="position: absolute; z-index: 5001; left: 312px; top: 0px; display: block;" class="zoomWindow"><div style="width: 368px;" class="zoomWrapper"><div style="width: 100%; position: absolute; display: none;" class="zoomWrapperTitle"></div><div style="width: 0%; height: 0px;" class="zoomWrapperImage"><img src="%E5%B0%9A%E9%83%BD%E6%AF%94%E6%8B%89%E5%A5%B3%E8%A3%852013%E5%A4%8F%E8%A3%85%E6%96%B0%E6%AC%BE%E8%95%BE%E4%B8%9D%E8%BF%9E%E8%A1%A3%E8%A3%99%20%E9%9F%A9%E7%89%88%E4%BF%AE%E8%BA%AB%E9%9B%AA%E7%BA%BA%E6%89%93%E5%BA%95%E8%A3%99%E5%AD%90%20%E6%98%A5%E6%AC%BE%20-%20Powered%20By%20Mango%20Team_files/6d53c211-2325-41ed-8696-d8fbceb1c199-large.jpg" style="position: absolute; border: 0px none; display: block; left: -432px; top: 0px;"></div></div></div><div style="visibility: hidden; top: 129.5px; left: 106px; position: absolute;" class="zoomPreload">Loading zoom</div></div>
+					</a>
+				
+			</div>
+			<div class="name">{{product.pname}}</div>
+			<div class="sn">
+				<div>编号:{{product.id}}</div>
+			</div>
+			<div class="info">
+				<dl>
+					<dt>商城价:</dt>
+					<dd>
+						<strong>￥：{{product.shop_price}}元</strong>
+							参 考 价：
+							<del>￥{{product.market_price}}元</del>
+					</dd>
+				</dl>
+					<dl>
+						<dt>促销:</dt>
+						<dd>
+								<a target="_blank" title="限时抢购 (2014-07-30 ~ 2015-01-01)">限时抢购</a>
+						</dd>
+					</dl>
+					<dl v-show="show">
+						<dt>收藏</dt>
+						<dd>
+							<span> <img src="images/collection.jpg" width="20px" height="20px" @click="collection"></span>
+						</dd>
+					</dl>
+					<dl v-show="!show">
+						<dt>已收藏</dt>
+						<dd>
+							<span> <img src="images/uncheck.jpg" width="20px" height="20px" @click="collection"></span>
+						</dd>
+					</dl>
+					<dl>
+						<dt>热度</dt>
+						<dd>
+							<span v-show="hotShow">  <img src="images/hotpoint.jpg" width="20px" height="20px" @click="collection">{{product.cnt*10}}</span>
+							<span v-show="!hotShow">  <img src="images/bighot.jpg" width="20px" height="20px" @click="collection">{{product.cnt*10}}</span>
+						</dd>
+					</dl>
+			</div>
+				<div class="action">
+					<form action="cart.html" method="post">
+						<input type="hidden" name="pid" value="1"/>
+						<dl class="quantity">
+							<dt>购买数量:</dt>
+							<dd>
+								<input id="quantity" v-model="quantity" name="count" value="1" min="1" maxlength="4" onpaste="return false;" type="number">
+								<div>
+									<span id="increase" @click="quantity++" class="increase">&nbsp;</span>
+									<span id="decrease" @click="quantity>1?--quantity:quantity" class="decrease">&nbsp;</span>
+								</div>
+							</dd>
+							<dd>
+								件
+							</dd>
+						</dl>
+					<div class="buy">
+							<input id="addCart" @click="add" class="addCart" value="加入购物车" type="button"><span>&nbsp&nbsp&nbsp</span>
+						`	<input id="countCart" @click="location.href='cart.html'" class="addCart" value="立即结算" type="button">
+					</div>
+				</form>
+				</div>
+			<div id="bar" class="bar">
+				<ul>
+						<li id="introductionTab">
+							<a href="#introduction">商品介绍</a>
+						</li>
+						
+				</ul>
+			</div>
+				
+				<div id="introduction" name="introduction" class="introduction">
+					<div class="title">
+						<strong>商品介绍</strong>
+						<strong><a :href="'showcomment.html?'+id">商品评价</a></strong>
+					</div>
+					<div>
+						{{product.pdesc}}
+						<br /><br />
+						<img :src="product.image" align="middle"/>
+					</div>
+				</div>
+		</div>
+	<script type="text/javascript">
+		var vue =new Vue({
+			el:".span18",
+			data:{
+				id:1,
+				show:"",
+				//单个商品数据
+				product:{},
+				hotShow:true,
+				quantity:1,
+				
+			},
+			created:function () {
+
+				this.id=location.search.replace("?",""); //去除最前面的?
+				axios({
+					url:"product.do?op=querySingleProduct",
+					params:{
+						id:this.id
+					}
+				}).then((res)=>{
+					this.product=res.data;
+
+					if (this.product.cnt<=100){
+
+						this.hotShow = true;
+
+					}else{
+						this.hotShow = false;
+					}
+
+					console.log(res.data);
+					console.log(this.product);
+				});
+				axios({
+					url:"product.do?op=queryIsCollect",
+					params:{
+						id:this.id
+					}
+				}).then((res)=>{
+					if(res.data.code){
+						this.show=false;
+					}else {
+						this.show=true;
+					}
+				});
+			},
+			methods:{
+				//添加购物车
+				add(){
+					var url="cart.do";
+					axios({
+						method:'get',
+						params:{
+							pid:this.id,
+							quantity:this.quantity,
+							op:'add'
+						},
+						url:url
+						
+					}).then(res=>{
+						alert(res.data.msg);
+					});
+				},
+				collection(){
+					if (this.show===true){
+						var url="product.do?op=collection";
+					}else {
+						var url="product.do?op=remCollection";
+					}
+					axios({
+						url:url,
+						params:{
+							id:this.product.id,
+						}
+					}).then((res)=>{
+						if (res.data.code){
+							alert(res.data.msg);
+							this.show=!this.show;
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
+			}
+		})
+	</script>
+	</div>
+<div id="footer">
+	<page-foot></page-foot>
+</div>
+
+<script type="text/javascript">
+	new Vue({el:"#footer"});
+</script>
+</body>
+</html>

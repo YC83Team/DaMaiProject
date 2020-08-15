@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>大麦商城</title>
+<link href="css/common.css" rel="stylesheet" type="text/css"/>
+<link href="css/product.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="js/vue.min.js"></script>
+<script type="text/javascript" src="js/axios.min.js"></script>
+<!-- 懒加载的插件 -->
+<script src="https://unpkg.com/vue-lazyload/vue-lazyload.js"></script>
+</head>
+<body>
+<div class="container header">
+	
+<div class="span5">
+		<div class="logo">
+			<a href="index.html">
+				<img src="image/r___________renleipic_01/logo.png" alt="依依不舍"/>
+			</a>
+		</div>
+	</div>
+	<div class="span9">
+<div class="headerAd">
+	<img src="image/header.jpg" width="320" height="50" alt="正品保障" title="正品保障"/>
+</div>	</div>
+<!-- header开始-->
+<div class="span10 last">
+			<div class="topNav clearfix">
+			<ul id="loginUser">
+
+					<li v-if="loginUser.cname" id="headerLogin" class="headerLogin" style="display: list-item;">
+					<a href="personal.html">我:{{loginUser.ename}}</a>|
+					</li>
+					<li v-else id="headerLogins" class="headerLogin" style="display: list-item;">
+						<a href="login.html">登录</a>|
+					</li>
+					<li id="headerRegister" class="headerRegister" style="display: list-item;">
+					<a href="reg.html">注册</a>|
+					</li>
+					<li id="headerLogin1" class="headerLogin" style="display: list-item;">
+						<a href="olist.html">我的订单</a>|
+					</li>
+					<li id="headerlogout1" class="headerRegister" style="display: list-item;">
+					<a  @click="logout">退出</a>|
+				</li>
+<!--				<li id="headerUsername" class="headerUsername"></li>-->
+<!--				<li id="headerLogout" class="headerLogout">-->
+<!--					<a>[退出]</a>|-->
+<!--				</li>-->
+						<li>
+							<a href="personal.html">会员中心</a>
+							|
+						</li>
+						<li>
+							<a>购物指南</a>
+							
+						</li>
+						
+			</ul>
+			<script type="text/javascript">
+				var user= new Vue({
+					el:"#loginUser",
+					data:{
+						loginUser:{
+							cname:""
+						}
+					},
+					created:function () {
+						axios({
+							url:"user.do?op=getUser",
+						}).then((res)=>{
+							this.loginUser=res.data;
+							console.info(this.loginUser)
+						})
+					},
+					methods:{
+						logout(){
+							axios({
+								url:"user.do?op=logout"
+							}).then((res)=>{
+								alert(res.data.msg)
+								if (res.data.code){
+									 location.href="login.html";
+								}
+							})
+						}
+					}
+				})
+			</script>
+		</div>
+		<div class="cart">
+			<a  href="cart.html">购物车</a>
+		</div>
+			<div class="phone">
+				客服热线:
+				<strong>96008/53277764</strong>
+			</div>
+	</div>
+<!-- header结束 -->
+	
+
+<!-- 顶部的导航 -->
+<div id="mainNav" class="span24">
+	<ul class="mainNav">
+		<li>
+			<a href="index.html">首页</a>|
+	    </li>
+				
+		<li v-for="fc in firstCategory">
+			<a @click="switchCategory(fc.id)"  >{{fc.cname}}</a>|
+		</li>
+				
+	</ul>
+</div>
+	<!-- 顶部的导航js代码 -->
+	<script type="text/javascript">
+		var vue2=new Vue({
+			el:"#mainNav",
+			data:{
+				firstCategory:[], //顶部的一级分类导航 
+			},
+			created:function(){
+				var url="category.do";
+				//查询一级分类导航
+				axios({
+					method:'get',
+					params:{
+						op:'queryByFirstCat'
+					},
+					url:url
+					
+				}).then(res=>{
+					this.firstCategory=res.data.list;
+					console.info("firstCategory:"+this.firstCategory);
+				});
+			},
+			methods:{
+				//选择其他商品分类，刷新页面
+				switchCategory(id){
+					console.info("switchCategory()的id:"+id);
+					//调用商品展示模块中函数刷新页面数据
+					vue.getProductInfo(id);
+				}
+			}
+			
+		});
+	</script>
+	<!-- 顶部的导航js代码结束 -->
+</div>
+<!-- 顶部的结束 -->
+
+
+<div class="container productList">
+    <!-- 左侧导航 开始-->
+	<div class="span6">
+		  <div id="secNav" class="hotProductCategory">
+				<dl v-for="s in secondCategory">
+					<!-- 一级分类 -->
+					<dt>
+						<a  @click="switchCategory(s.firstCat.id)">{{s.firstCat.cname}}</a>
+					</dt>
+					<!-- 二级分类 -->
+					<dd v-for="sc in s.secondCat">
+						<a   @click="switchCategory(sc.secid)" >{{sc.seccname}}</a>
+					</dd>
+					
+				</dl>
+		 </div>
+		
+		  <!-- 左侧导航js代码 -->
+		 <script type="text/javascript">
+		 
+		 var currentFircname=''; //当前一级分类
+		 var vue3=new Vue({
+				el:"#secNav",
+				data:{
+					secondCategory:[], //顶部的一级分类导航 
+				},
+				created:function(){
+					var url="category.do";
+					//查询一级分类导航
+					axios({
+						method:'get',
+						params:{
+							op:'queryBySecondCat'
+						},
+						url:url
+						
+					}).then(res=>{
+						this.secondCategory=res.data;
+						console.info(this.secondCategory);
+					});
+				},
+				methods:{
+					
+					switchCategory(id){
+						console.info("switchCategory()的id:"+id);
+						//调用商品展示模块中函数刷新页面数据
+						vue.getProductInfo(id);
+					}
+				}
+			});
+		 </script>
+		  <!-- 左侧导航js代码结束 -->
+	</div>
+	<!-- 左侧导航结束 -->	
+	
+	<!-- 商品部分 开始-->
+	<div class="span18 last">
+	
+	<form id="productForm" action="image/蔬菜 - Powered By Mango Team.htm" method="get">
+	<input type="hidden" id="brandId" name="brandId" value=""/>
+	<input type="hidden" id="promotionId" name="promotionId" value=""/>
+	<input type="hidden" id="orderType" name="orderType" value=""/>
+	<input type="hidden" id="pageNumber" name="pageNumber" value="1"/>
+	<input type="hidden" id="pageSize" name="pageSize" value="20"/>
+			
+	<!-- 商品信息展示 -->
+	<div id="result" class="result table clearfix">
+			<ul>
+				<li v-for="p in proList">
+					<a :href=" 'detail.html?'+p.id ">
+						<img v-lazy="p.image" width="170" height="170"  style="display: inline-block;"/>
+						   
+						<span style='color:green'>
+						{{p.pname}}
+						</span>
+						 
+						<span class="price">
+							商城价： ￥{{p.shop_price}}/份
+						</span>
+						 
+					</a>
+				</li>
+			</ul>
+	</div>
+	<!-- 商品信息展示结束 -->	
+	
+	<!-- 分页查询 -->		
+	<div  class="pagination">
+	<span>第   {{currentIndex}}/{{pageCount}} 页</span> 
+		
+		<a  v-model="currentIndex"  v-for="currentIndex in pageCount"   
+			@click="changePage(category,currentIndex)">
+			{{currentIndex}}
+		</a>
+		
+		<a class="nextPage" @click="nextPage">
+			&nbsp;
+		</a>
+		
+		<a class="lastPage" @click="lastPage">
+			&nbsp;
+		</a>
+				
+	</div>
+	<!-- 分页查询 结束-->	
+			
+	<!-- 向后台请求数据 -->		
+	<script  type="text/javascript">
+	
+		Vue.use(VueLazyload,{ 
+		    error:'images/error.jpg',                    //报错时需要的图片
+			loading:'images/loading_icon.gif',   //加载时需要的图片
+			
+			}
+		);
+		var vue=new Vue({
+			el:"#productForm",
+			data:{
+				proList:[] ,  //商品信息列表
+				pageCount:1, //总共的页数
+				category:1,  //商品类别id
+				currentIndex:1, //当前页
+				pageSize:5,  //默认每一页的商品个数
+			},
+			created:function(){
+				
+				var id=location.hash.substring(1);
+				this.category=id;
+				console.info("this.category="+id);
+				
+				//获取需要展示的商品数据
+				this.getProductInfo(this.category,this.currentIndex);
+				
+			},
+			methods:{
+				
+				//获取需要展示的商品数据
+				getProductInfo(category,pageIndex){
+					
+					var url="product.do";
+					
+					axios({
+						method:'get',
+						params:{
+							category:category?category:1,
+							pageIndex:pageIndex?pageIndex:1,
+							pageSize:this.pageSize,
+							op:'queryByList'
+						},
+						url:url
+						
+					}).then(res=>{
+						this.proList=res.data.list;
+						this.pageCount=res.data.pageCount;
+						this.category=res.data.list[0].cid;
+						this.currentIndex=pageIndex?pageIndex:1;
+						console.info("this.pageCount:"+this.pageCount);
+					});
+					
+				},
+				//跳转页面
+				changePage(category,pageIndex){
+					
+					category=parseInt(category);
+					console.info("changePage的category:"+category);
+					console.info("this.category:"+this.category);
+					pageIndex=parseInt(pageIndex);
+					
+					this.getProductInfo(category,pageIndex);
+				},
+				//下一页
+				nextPage(){
+					
+					//转为数字类型，避免相加时出错
+					this.pageCount=parseInt(this.pageCount);
+					this.currentIndex=parseInt(this.currentIndex);
+					
+					var nextIndex;
+					
+					if(this.currentIndex<this.pageCount){
+						nextIndex=this.currentIndex+1;
+					}else{
+						nextIndex=this.pageCount;
+					}
+					
+					console.info("nextIndex="+nextIndex);
+					
+					this.changePage(this.category,nextIndex);
+					
+				},
+				
+				//最后一页
+				lastPage(){
+					
+					this.pageCount=parseInt(this.pageCount);
+					this.changePage(this.category,this.pageCount);
+				}
+				
+			}
+		});
+		
+	</script>
+
+			
+</form>
+	
+	</div>
+	<!-- 商品部分结束 -->
+</div>
+	
+	
+<div class="container footer">
+	<div class="span24">
+		<div class="footerAd">
+					<img src="image/footer.jpg" width="950" height="52" alt="我们的优势" title="我们的优势"/>
+</div>	</div>
+	<div class="span24">
+		<ul class="bottomNav">
+					<li>
+						<a >关于我们</a>
+						|
+					</li>
+					<li>
+						<a>联系我们</a>
+						|
+					</li>
+					<li>
+						<a >诚聘英才</a>
+						|
+					</li>
+					<li>
+						<a >法律声明</a>
+						|
+					</li>
+					<li>
+						<a>友情链接</a>
+						|
+					</li>
+					<li>
+						<a target="_blank">支付方式</a>
+						|
+					</li>
+					<li>
+						<a  target="_blank">配送方式</a>
+						|
+					</li>
+					<li>
+						<a >SHOP++官网</a>
+						|
+					</li>
+					<li>
+						<a >SHOP++论坛</a>
+						
+					</li>
+		</ul>
+	</div>
+	<div class="span24">
+		<div class="copyright">Copyright © 2005-2013 Mango商城 版权所有</div>
+	</div>
+</div>
+</body></html>

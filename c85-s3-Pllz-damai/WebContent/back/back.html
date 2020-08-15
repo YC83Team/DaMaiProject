@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>back</title>
+	<link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+	<script type="text/javascript" src="easyui/jquery.min.js"></script>
+	<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="easyui/locale/easyui-lang-zh_CN.js"></script>
+</head>
+<body>
+
+<div class="easyui-layout" fit="true">
+    <div data-options="region:'north',split:true" style="height:10px;"></div>
+    <div class="easyui-accordion" data-options="region:'west',title:'menu',split:true" 
+    style="width:200px;">
+			<div id="sm"  class="easyui-sidemenu" title="后台" 
+			data-options="
+			iconCls:'icon-ok',
+			data:data,
+			fit:true,
+			onSelect:selectMenu"
+			style="overflow:auto;">
+			</div>
+			<div title="帮助" data-options="iconCls:'icon-help'" style="padding:10px;">
+			</div>
+			
+    	</div>
+    <div id="tt" class="easyui-tabs" data-options="region:'center',title:'function'" 
+    style="padding:5px;background:#eee;fit:true"></div>
+</div>
+	
+	<script type="text/javascript">
+		var data = [{
+	        text: '管理页面',
+	        iconCls: 'icon-sum',
+	        state: 'open',
+	        children: [{
+	            text: '订单管理',
+	            url:'order.html'
+	        },{
+	            text: '商品管理',
+	            url:'product.html'
+	        }]
+		} ,{
+	        text: 'Mail',
+	        iconCls: 'icon-more',
+	        children: [{
+	            text: 'Option4'
+	        },{
+	            text: 'Option5'
+	        },{
+	            text: 'Option6'
+	        }]
+	    }];
+ 		
+		function selectMenu(item){
+			if($('#tt').tabs('exists',item.text)){
+				$('#tt').tabs('select',item.text);
+			}else{
+				$('#tt').tabs('add',{
+				    title:item.text,
+				    selected:true,
+				    //ifram 嵌入的子框架   子页面
+				    content:"<iframe src=' "+item.url+" '  style='width:100%;height:100%;border:0px' ></iframe>"
+				    
+				});
+			}
+			
+		}
+		
+	</script>
+</body>
+</html>

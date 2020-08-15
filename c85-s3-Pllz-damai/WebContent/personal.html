@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>大麦商城</title>
+<link href="css/common.css"
+	rel="stylesheet" type="text/css" />
+<link href="css/register.css"
+	rel="stylesheet" type="text/css" />
+	<link href="css/check.css"
+		  rel="stylesheet" type="text/css"/>
+<script type="text/javascript"
+	src="js/jquery-1.8.3.js"></script>
+	<script type="text/javascript" src="js/axios.min.js"></script>
+	<script type="text/javascript" src="js/vue.min.js"></script>
+	<script type="text/javascript" src="js/comp.js"></script>
+	<script type="text/javascript" src="js/check.js"></script>
+</head>
+<body>
+<div class="container header">
+	
+<div class="span5">
+		<div class="logo">
+			<a href="index.html">
+				<img src="image/r___________renleipic_01/logo.png" alt="依依不舍"/>
+			</a>
+		</div>
+	</div>
+	<div class="span9">
+<div class="headerAd">
+	<img src="image/header.jpg" width="320" height="50" alt="正品保障" title="正品保障"/>
+</div>	</div>
+<!-- header开始-->
+<div class="span10 last">
+			<div class="topNav clearfix">
+			<ul id="loginUser">
+
+					<li v-if="loginUser.cname" id="headerLogin" class="headerLogin" style="display: list-item;">
+					<a href="personal.html">我:{{loginUser.ename}}</a>|
+					</li>
+					<li v-else id="headerLogins" class="headerLogin" style="display: list-item;">
+						<a href="login.html">登录</a>|
+					</li>
+					<li id="headerRegister" class="headerRegister" style="display: list-item;">
+					<a href="reg.html">注册</a>|
+					</li>
+					<li id="headerLogin1" class="headerLogin" style="display: list-item;">
+						<a href="olist.html">我的订单</a>|
+					</li>
+					<li id="headerlogout1" class="headerRegister" style="display: list-item;">
+					<a  @click="logout">退出</a>|
+				</li>
+<!--				<li id="headerUsername" class="headerUsername"></li>-->
+<!--				<li id="headerLogout" class="headerLogout">-->
+<!--					<a>[退出]</a>|-->
+<!--				</li>-->
+						<li>
+							<a href="personal.html">会员中心</a>
+							|
+						</li>
+						<li>
+							<a>购物指南</a>
+						</li>
+						
+			</ul>
+			<script type="text/javascript">
+				var user= new Vue({
+					el:"#loginUser",
+					data:{
+						loginUser:{
+							cname:"",
+							id:1
+						}
+					},
+					created:function () {
+						axios({
+							url:"user.do?op=getUser",
+						}).then((res)=>{
+							this.loginUser=res.data;
+							console.info(this.loginUser)
+						})
+					},
+					methods:{
+						logout(){
+							axios({
+								url:"user.do?op=logout"
+							}).then((res)=>{
+								alert(res.data.msg)
+								if (res.data.code){
+									 location.href="login.html";
+								}
+							})
+						}
+					}
+				})
+			</script>
+		</div>
+		<div class="cart">
+			<a  href="cart.html">购物车</a>
+		</div>
+			<div class="phone">
+				客服热线:
+				<strong>96008/53277764</strong>
+			</div>
+	</div>
+<!-- header结束 -->
+	
+	
+
+
+<!-- 顶部的导航 -->
+<div id="mainNav" class="span24">
+	<ul class="mainNav">
+		<li>
+			<a href="index.html">首页</a>|
+	    </li>
+				
+		<li v-for="fc in firstCategory">
+			<a @click="switchCategory(fc.id)"  >{{fc.cname}}</a>|
+		</li>
+				
+	</ul>
+</div>
+	<!-- 顶部的导航js代码 -->
+	<script type="text/javascript">
+		var vue2=new Vue({
+			el:"#mainNav",
+			data:{
+				firstCategory:[], //顶部的一级分类导航 
+			},
+			created:function(){
+				var url="category.do";
+				//查询一级分类导航
+				axios({
+					method:'get',
+					params:{
+						op:'queryByFirstCat'
+					},
+					url:url
+					
+				}).then(res=>{
+					this.firstCategory=res.data.list;
+					console.info("firstCategory:"+this.firstCategory);
+				});
+			},
+			methods:{
+				//选择其他商品分类，刷新页面
+				switchCategory(id){
+					console.info("switchCategory()的id:"+id);
+					location.href= 'clist.html#'+id;
+				}
+			}
+			
+		});
+	</script>
+	<!-- 顶部的导航js代码结束 -->
+</div>
+<!-- 顶部的结束 -->
+
+	
+	<div class="container register">
+		<div class="span24">
+			<div class="wrap">
+				<div class="main clearfix">
+					<div class="title">
+						<strong>个人中心</strong>PERSONAL
+						<a href="alter.html"><strong>安全设置</strong>SETTINGS</a>
+						<a href="footstep.html"><strong>我的足迹</strong>FOOTPRINT</a>
+						<a href="collection.html"><strong>我的收藏</strong>COLLECTIONS</a>
+						<a href="address.html"><strong>地址管理</strong>ADDRESS</a>
+					</div>
+					<form id="upImg">
+
+					</form>
+					<form id="personalForm"
+						action="personal.html"
+						method="post" novalidate="novalidate"
+						onsubmit="return checkForm();">
+						<table>
+							<tbody>
+								<tr>
+									<th><span class="requiredField"></span>头像:</th>
+									<td>
+										<img  alt="" :src="loginUser.image!=''?loginUser.image:'images/addpicture.jpg' " class="round_icon"  height="100px" width="100px" id="userImage" @click="imageOnClick" ><br>
+										<input type="file" name="file" id="getImage" style="display: none" v-on:change="changeImage"><br>
+										<input  type="text" id="image" v-model="loginUser.image" name="image" class="text" maxlength="200" :value="loginUser.ename"  disabled="disabled" style="display: none"/>
+									</td>
+								</tr>
+								<tr>
+									<th><span class="requiredField"></span>用户名:</th>
+									<td><input  type="text" id="username"  name="username"
+										class="text" maxlength="20" :value="loginUser.ename" onchange="checkuname(this.value)" disabled="disabled"/>
+										<div id="unameResult" style="display: none"></div><span
+										id="span1">
+									</span></td>
+								</tr>
+								<tr>
+									<th><span class="requiredField"></span>姓名:</th>
+									<td><input  type="text" id="cname" v-model="loginUser.cname" name="name" class="text"
+											   maxlength="200" :value="loginUser.cname" onchange="checkcname(this.value)" disabled="disabled">
+										<div id="cnameResult" style="display: none"></div>
+									</td>
+								</tr>
+								<tr>
+									<th>性别:</th>
+									<td><span class="fieldSet">
+										<label>
+										<input
+											id="man"	type="radio" name="sex" :value="loginUser.sex" :checked="loginUser.sex=='男'?true:false" disabled="disabled">男
+										</label>
+										<label>
+										<input
+											id="women"	type="radio" name="sex" :value="loginUser.sex" :checked="loginUser.sex=='女'?true:false" disabled="disabled">女
+										</label>
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<th><span class="requiredField"></span>E-mail:</th>
+									<td><input  type="text" id="email" name="email" v-model="loginUser.email"
+										class="text" maxlength="200"  onchange="checkemail(this.value)" disabled="disabled"/>
+										<div id="emailResult" style="display: none"></div>
+										<span>
+									</span></td>
+								</tr>
+								<tr>
+									<th><span class="requiredField"></span>电话:</th>
+									<td><input  type="text" id="phone" name="phone" v-model="loginUser.phone"
+										class="text" maxlength="200" :value="loginUser.phone" onchange="checkphone(this.value)" disabled="disabled">
+										<div id="phoneResult" style="display: none"></div>
+									</td>
+								</tr>
+								<tr>
+									<th><span class="requiredField"></span>入会日期:</th>
+									<td><input  type="text" id="creatTime" name="creatTime"
+											   class="text" maxlength="200" :value="loginUser.createtime" disabled="disabled">
+									</td>
+								</tr>
+								<tr>
+									<th>&nbsp;</th>
+									<td v-if="flag===1">
+										<input  v-on:click="edit()" type="button" class="submit" value="编辑">
+									</td>
+									<td v-else>
+										<input  v-on:click="flash()"  type="button" class="submit" value="保存">
+									</td>
+							</tbody>
+						</table>
+					</form>
+					<script type="text/javascript">
+						var user= new Vue({
+							el:"#personalForm",
+							data:{
+								loginUser:{
+									email:"",
+									phone:"",
+									sex:"",
+									cname:"",
+									image:""
+								},
+								flag:1,
+							},
+							created:function () {
+								axios({
+									url:"user.do?op=getUser",
+								}).then((res)=>{
+									this.loginUser=res.data;
+									console.info(this.loginUser);
+									console.info("loginUser.image="+ typeof this.loginUser.image);
+									
+								})
+							},
+							methods:{
+								//todo 编辑到保存的跳转
+								edit(){
+									this.flag = 2// todo 判断if else
+									$("cname").removeAttribute("disabled");
+									// $("email").removeAttribute("disabled");
+									// $("phone").removeAttribute("disabled");
+									$("man").removeAttribute("disabled");
+									$("women").removeAttribute("disabled");
+
+								},
+								//隐藏file 控件 但是获得点击效果
+								imageOnClick(){
+									this.flag = 2// todo 判断if else
+									document.getElementById('getImage').click();//my_photo隐藏的input[file]的id
+								},
+								flash(){
+									axios({
+										url:"user.do?op=flash",
+										params:{
+											email: this.loginUser.email,
+											phone: this.loginUser.phone,
+											sex: this.loginUser.sex,
+											cname:this.loginUser.cname,
+											image:this.loginUser.image
+										}
+									}).then((res)=>{
+										if (res.data.code){
+											location.href="personal.html";
+										}
+										alert(res.data.msg);
+									})
+								},
+								changeImage(){
+									var url = "upload.do";
+									var fd = new FormData(personalForm);
+									axios.post(
+											url,
+											fd,
+											{
+												headers:{
+													"Content-Type":"multipart/form-data"
+												}
+											}
+									).then(res=>{
+										alert(res.data.msg);
+										if(res.data.code){
+											userImage.src = res.data.data;
+											this.loginUser.image=res.data.data;
+											console.info("this.loginUser.image:"+this.loginUser.image);
+										}
+									});
+								}
+							}
+						})
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="footer">
+		<page-foot></page-foot>
+	</div>
+
+	<script type="text/javascript">
+		new Vue({el:"#footer"});
+	</script>
+	<div id="_my97DP"
+		style="position: absolute; top: -1970px; left: -1970px;">
+		<iframe style="width: 190px; height: 191px;"
+			src="./会员注册 - Powered By Mango Team_files/My97DatePicker.htm"
+			frameborder="0" border="0" scrolling="no"></iframe>
+	</div>
+</body>
+</html>

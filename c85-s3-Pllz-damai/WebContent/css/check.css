@@ -1,0 +1,16 @@
+
+.errorCss{
+    color: orangered;
+}
+.rightCss{
+    color: green;
+}
+.round_icon{
+    width: 100px;
+    height: 100px;
+    display: flex;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}

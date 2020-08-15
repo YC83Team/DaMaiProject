@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>商品评价</title>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/axios.min.js"></script>
+<script type="text/javascript" src="js/vue.min.js"></script>
+<link href="css/showcomment.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="static/css/font-awesome.css">
+<link rel="stylesheet" href="static/css/font-awesome.min.css">
+
+</head>
+<body>
+<div id="my">
+	<!-- 商品总评 -->
+		
+		<div class="totalinfo">
+			<img alt="商品图片" :src="pimage"> 
+			<span>{{pname}}</span>
+			<div class="star">
+				<span>商品评分</span>
+				<span >{{level}}</span>
+			</div>
+		</div>
+     <!-- 商品评价 -->
+     <div class="cm-div">
+     	<table id="cmtable" v-if="showCmt">
+     		<tbody>
+     			<tr v-for="cm in commentInfo">
+     				<!-- 评论的作者信息 -->
+     				<td class="col-author">
+     					<div  class="cm-user-info">
+     						<div>
+     							<img class="user-header" alt="" :src="isHeadEmpty(cm.uimage)"/>
+     						</div>
+     						<p v-if="cm.anonymous==1" class="user-nickname">用户昵称:匿名用户</p>
+     						<p v-else class="user-nickname">用户昵称:{{cm.ename}}</p>
+				     	</div>
+				     	
+     				</td>
+     				<!-- 评论的主要内容 -->
+     				<td class="col-master" >
+     					<!-- 评论内容 -->
+     					<div  class="cm-fulltext">
+     						{{cm.comment}}
+				     	</div>
+				     	<!-- 评论的图片 -->
+				     	<div  class="cm-photos">
+				     		<ul>
+				     			<li class="cm-photos-li" v-if="isImageEmpty(cm.image1) ">
+				     				<img  alt="点击上传图片" :src="cm.image1">
+				     			</li>
+				     			<li class="cm-photos-li" v-if="isImageEmpty(cm.image2)">
+				     				<img  alt="点击上传图片" :src="cm.image2">
+				     			</li>
+				     			<li class="cm-photos-li" v-if="isImageEmpty(cm.image3)">
+				     				<img  alt="点击上传图片" :src="cm.image3">
+				     			</li>
+				     			<li class="cm-photos-li" v-if="isImageEmpty(cm.image4)">
+				     				<img  alt="点击上传图片" :src="cm.image4">
+				     			</li>
+				     		</ul>
+				     	</div>
+				     	<!-- 评论的日期 -->
+				     	<div  class="cm-date">
+				     		{{cm.createtime}}
+				     	</div>
+     				</td>
+     				<!-- 回复，点赞 -->
+     				<td class="col-option">
+     					<a><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></a>
+     					<!-- 已点赞 <i class="fa fa-thumbs-up" aria-hidden="true"> -->
+				     	<a><i class="fa fa-commenting-o" aria-hidden="true"></i> </a>
+     				</td>
+     			</tr>
+     		</tbody>
+     	</table>
+     	<div v-else>
+     		<p>该商品暂无评论</p>
+     	</div>
+     </div>
+</div>
+<script type="text/javascript">
+	
+	var vue=new Vue({
+		el:"#my",
+		data:{
+			pid:1,
+			pimage:'',
+			pname:'',
+			level:'暂无评分',
+			proInfo:[],  //商品信息
+			commentInfo:[],  //评价信息
+			showCmt:false,
+		},
+		created:function(){
+		    //获取商品id
+			this.pid=location.search.replace("?",""); //去除最前面的?
+			console.info("pid:"+this.pid);
+			//获取商品信息
+			axios.get("product.do",{
+				  params: {
+					  id:this.pid,
+					  op:"queryByDetail"
+				  }
+				}).then(res=>{
+					this.proInfo=res.data.list[0];
+					this.pimage=this.proInfo.image;
+					this.pname=this.proInfo.pname;
+				});
+			//获取评论信息
+			axios.get("comment.do",{
+			  params: {
+				  pid:this.pid,
+				  op:"queryByPid"
+			  }
+			}).then(res=>{
+				
+				console.info(res.data.list);
+				
+				if(!this.isCmEmpty(res.data.list)){
+					this.showCmt=true;
+					this.level=res.data.level;
+					this.commentInfo = res.data.list;
+				}
+				
+
+			});
+		},
+		methods:{
+			//判断图片是否为空
+			isImageEmpty(data){
+				if(data!=undefined && data!=''){
+					return true;
+				}
+				return false;
+			},
+			//判断头像是否为空
+			isHeadEmpty(data){
+				if(data!=undefined && data!=''){
+					return data;
+				}
+				return 'images/unloginhed.jpg';
+			},
+			//判断该商品是否有评论
+			isCmEmpty(cmt){
+				if(cmt.length==0){
+					return true;
+				}else{
+					return false;
+				}
+			}
+		}
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>商品评价</title>
+<link href="css/slider.css" rel="stylesheet" type="text/css"/>
+<link href="css/common.css" rel="stylesheet" type="text/css"/>
+<link href="css/index.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="static/css/font-awesome.css">
+<link rel="stylesheet" href="static/css/font-awesome.min.css">
+<link href="css/common.css" rel="stylesheet" type="text/css" />
+<link href="css/login.css" rel="stylesheet" type="text/css" />
+<link href="css/comment.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/axios.min.js"></script>
+<script type="text/javascript" src="js/vue.min.js"></script>
+<style type="text/css">
+	button {
+	width: 100px;
+	height: 35px;
+	line-height: 35px;
+	margin-bottom: 10px;
+	margin-left: 120px;
+	color: #ffffff;
+	cursor: pointer;
+	outline: none;
+	blr: expression(this.hideFocus = true);
+	border: none;
+	background: url(images/login.gif) 0px 0px no-repeat;
+}
+</style>
+</head>
+<body>
+	
+	<div id="mycomment">
+		<!-- 商品总评 -->
+		<div class="proinfo">
+			<img alt="商品图片" :src="proInfo.image"> <span>{{proInfo.pname}}</span>
+			<div class="star">
+				<span>商品评分</span>
+				<ul>
+					<li><a @click="getStar(1)"><i id="star1"
+							class="fa fa-star" aria-hidden="true"></i></a></li>
+					<li><a @click="getStar(2)"><i id="star2"
+							class="fa fa-star" aria-hidden="true"></i></a></li>
+					<li><a @click="getStar(3)"><i id="star3"
+							class="fa fa-star" aria-hidden="true"></i></a></li>
+					<li><a @click="getStar(4)"><i id="star4"
+							class="fa fa-star" aria-hidden="true"></i></a></li>
+					<li><a @click="getStar(5)"><i id="star5"
+							class="fa fa-star" aria-hidden="true"></i></a></li>
+				</ul>
+				<span v-model="level" v-text="level"></span>
+			</div>
+		</div>
+		<!-- 评价内容 -->
+		<div class="content">
+			<textarea id="comment" maxlength="300"
+				placeholder="亲，您对这个商品满意吗？您的评价会帮助我们选择更好的商品哦~"></textarea>
+
+		</div>
+		<!-- 图片上传 -->
+		<form id="myform">
+			<div class="picture">
+				<input type="file" name="file" id="imagefile" style="display: none" @change="getPictures"><br>
+				<img  @click="imageOnClick('img1','img2')" id="img1" alt="点击上传图片" src="images/addpicture.jpg" style="display:inline-block">
+				<img  @click="imageOnClick('img2','img3')" id="img2" alt="点击上传图片" src="images/addpicture.jpg" >
+				<img  @click="imageOnClick('img3','img4')" id="img3" alt="点击上传图片" src="images/addpicture.jpg" >
+				<img  @click="imageOnClick('img4','img4')" id="img4" alt="点击上传图片" src="images/addpicture.jpg">
+			</div>
+		</form>
+		<div class="anonymous-div">
+			<input @change="getAnonymous" type="checkbox" id="anonymous"><label>匿名评价</label>
+		</div>
+		<div class="op">
+			<button @click="addComment" id="submit">评价</button>
+			<button id="cancel">取消</button>
+		</div>
+		
+	</div>
+	<script type="text/javascript">
+		var vue=new Vue({
+			el:"#mycomment",
+			data:{
+				uid:5,
+				oiid:1,
+				proInfo:{}, //待评价的商品信息
+				level:5,   //商品的评分  几颗星
+				comment:'', //评价的内容
+				image1:'',  //图片1
+				image2:'',  //图片2
+				image3:'',  //图片3
+				image4:'',  //图片4
+				currentimg:'', //当前上传图片的id
+				nextimg:'img1' , //下一张上传图片的id
+				anonymous:0,  //是否匿名
+			},
+			created:function(){
+				var url=location.search.replace("?oiid=","");
+				var arr=url.split("&uid=");
+				//获取商品详情id
+				this.oiid=arr[0];
+				console.info("oiid:"+this.oiid);
+				//获取当前用户id
+				this.uid=arr[1];
+				console.info("uid:"+this.uid);
+				//获取商品id
+				var id=location.hash.replace("#","");
+				axios.get("product.do",{
+				  params: {
+					  id:id,
+					  op:"queryByDetail"
+				  }
+				}).then(res=>{
+					console.info(res.data.list[0]);
+					this.proInfo = res.data.list[0];
+
+				});
+			},
+			methods:{
+				//商品的评分  几颗星
+				getStar(index){
+					var index=parseInt(index);
+					this.level=index;
+					for(var i=1;i<=index;i++){
+						this.starblack('star'+i);
+					}
+					for(var i=index+1;i<=5;i++){
+						this.starwhite('star'+i);
+					}
+				},
+				//星星亮起来 变黑
+				starblack(id){
+					document.getElementById(id).className="fa fa-star";
+				},
+				//星星暗下去 变白
+				starwhite(id){
+					document.getElementById(id).className="fa fa-star-o";
+				},
+				//是否匿名
+				getAnonymous(){
+					if(anonymous.checked){
+						this.anonymous=1;
+					}else{
+						this.anonymous=0;
+					}
+				},
+				//点击图片
+				imageOnClick(id1,id2){
+					this.currentimg=id1;
+					this.nextimg=id2;
+					imagefile.click();//点击图片时 相当于点击文件选择框
+				},
+				//上传图片
+				getPictures(){
+					var url = "upload.do";
+					var fd = new FormData(myform);
+					axios.post(
+							url,
+							fd,
+							{
+								headers:{
+									"Content-Type":"multipart/form-data"
+								}
+							}
+					).then(res=>{
+						alert(res.data.msg);
+						if(res.data.code){
+							console.info("this.nextimg="+this.nextimg+"");
+							console.info("this.currentimg="+this.currentimg+"");
+							document.getElementById(this.nextimg).style.display='inline-block';
+							document.getElementById(this.currentimg).src = res.data.data;
+							switch(this.currentimg){
+								case 'img1':
+									this.image1=res.data.data;
+									console.log('img1:'+this.image1);
+									break;
+								case 'img2':
+									this.image2=res.data.data;
+									console.log('img2:'+this.image2);
+									break;
+								case 'img3':
+									this.image3=res.data.data;
+									console.log('img3:'+this.image3);
+									break;
+								case 'img4':
+									this.image4=res.data.data;
+									console.log('img4:'+this.image4);
+									break;
+							}
+						}
+					});
+				},
+				addComment(){
+					this.comment=$('#comment').val();  //获取评价的内容
+					axios({
+						url:"comment.do",
+						params:{
+							
+							uid:this.uid,
+							oiid:this.oiid,
+							level:this.level,
+							comment: this.comment,
+							image1: this.image1,
+							image2: this.image2,
+							image3: this.image3,
+							image4: this.image4,
+							anonymous:this.anonymous,
+							op:'addComment'
+						}
+					}).then((res)=>{
+						alert(res.data.msg);
+						location.href="olist.html";
+					})
+				}
+			}
+		});
+	</script>
+</body>
+</html>

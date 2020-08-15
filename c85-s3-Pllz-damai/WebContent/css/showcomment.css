@@ -1,0 +1,130 @@
+@charset "UTF-8";
+
+/*通用*/
+	body{
+		width:100%;
+		height:560px;
+	}
+	#my{
+		width: 80%;
+		margin:0 auto;
+		background-color: #F6F6F6;
+	}
+	span {
+		margin-left: 10px;
+		margin-top: 20px;
+		font-weight: bold;
+	}
+	/*商品信息*/
+	.totalinfo {
+	width: 100%;
+	height:20%;
+	margin:0 auto;
+	float: left;
+	
+	border-bottom:3px solid #C8C8C8;
+	}
+
+	.totalinfo>img {
+	width: 100px;
+	height: 100px;
+	display: inline-block;
+	float: left;
+	}
+	.star {
+	height: 50%;
+	}
+	
+	.star-ul {
+	width: 130px;
+	height: 20px;
+	float: left;
+	position: relative;
+	top: 20px;
+	padding-left: 0px;
+	}
+
+	.star-li{
+		list-style-type: none;
+		float: left;
+		margin-left: 10px;
+		padding-top: 0px;
+	}
+
+	.star>span {
+		position:relative;
+		top:15px;
+		margin-left: 10px;
+		margin-top: 20px;
+		font-weight: bold;
+		float: left;
+	}
+	table{
+		width:100%;
+		height:80%;
+		overflow: scroll;
+	}
+	/* 评论的主要内容 */
+	.col-master{
+		border-bottom: 1px solid #E3E3E3;
+		padding-left: 10px;
+		width: 75%;
+	}
+	.col-author{
+		width: 15%;
+		padding-left: 10px;
+	}
+	.col-option{
+		width: 10%;
+	}
+	/*评论作者信息*/
+	.user-header{
+		width:50px; 
+		height:50px; 
+		border-radius:50%;
+	}
+	
+	.user-nickname{
+		width:90px;
+		font-size:x-small;
+		font-family: serif;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		text-align: center;
+	}
+	.cm-fulltext{
+		width: 90%;
+		font-family: serif;
+		margin-top: 10px;
+		float:left;
+	}
+	.cm-photos{
+		float: left;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+	.cm-photos>ul{
+		padding-left: 0px;
+		width: 100%;
+	}
+	.cm-photos-li{
+	  
+		list-style-type: none;
+		float:left;
+		display: inline-block;
+	}
+	.cm-photos>ul>li>img{
+		width: 60px;
+		height: 60px;
+		float: left;
+		margin-right: 10px;
+	}
+	.cm-date{
+		clear:both;
+		margin-bottom: 5px;
+		font-size:x-small;
+	}
+	.col-option>a{
+		margin-right: 10px;
+	}

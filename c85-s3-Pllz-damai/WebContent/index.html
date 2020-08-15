@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>大麦商城</title>
+<link href="css/slider.css" rel="stylesheet" type="text/css"/>
+<link href="css/common.css" rel="stylesheet" type="text/css"/>
+<link href="css/index.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="js/vue.min.js"></script>
+<script type="text/javascript" src="js/axios.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.css">
+	<script src="https://unpkg.com/swiper/swiper-bundle.js"> </script>
+<!-- 懒加载的插件 -->
+<script src="https://unpkg.com/vue-lazyload/vue-lazyload.js"></script>
+<style>
+		
+		.swiper-container {
+			width: 950px;
+			height: 300px;
+
+		}
+		.swiper-slide {
+			text-align: center;
+			font-size: 18px;
+			background: #fff;
+			position: relative;
+
+			/* Center slide text vertically */
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-box-pack: center;
+			-ms-flex-pack: center;
+			-webkit-justify-content: center;
+			justify-content: center;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			-webkit-align-items: center;
+			align-items: center;
+		}
+	</style>
+</head>
+<body>
+<!-- header开始 -->
+<div class="container header">
+
+<div class="span5">
+		<div class="logo">
+			<a href="index.html">
+				<img src="image/r___________renleipic_01/logo.png" alt="依依不舍"/>
+			</a>
+		</div>
+	</div>
+	<div class="span9">
+<div class="headerAd">
+	<img src="image/header.jpg" width="320" height="50" alt="正品保障" title="正品保障"/>
+</div>	</div>
+<div class="span10 last">
+		<div class="topNav clearfix">
+			<ul id="loginUser">
+
+					<li v-if="loginUser.cname" id="headerLogin" class="headerLogin" style="display: list-item;">
+					<a href="personal.html">我:{{loginUser.ename}}</a>|
+					</li>
+					<li v-else id="headerLogins" class="headerLogin" style="display: list-item;">
+						<a href="login.html">登录</a>|
+					</li>
+					<li id="headerRegister" class="headerRegister" style="display: list-item;">
+					<a href="reg.html">注册</a>|
+					</li>
+					<li id="headerLogin1" class="headerLogin" style="display: list-item;">
+						<a href="olist.html">我的订单</a>|
+					</li>
+					<li id="headerlogout1" class="headerRegister" style="display: list-item;">
+					<a  @click="logout">退出</a>|
+				</li>
+<!--				<li id="headerUsername" class="headerUsername"></li>-->
+<!--				<li id="headerLogout" class="headerLogout">-->
+<!--					<a>[退出]</a>|-->
+<!--				</li>-->
+						<li>
+							<a href="personal.html">会员中心</a>
+							|
+						</li>
+						<li>
+							<a>购物指南</a>
+						</li>
+						
+			</ul>
+			<script type="text/javascript">
+				var user= new Vue({
+					el:"#loginUser",
+					data:{
+						loginUser:{
+							cname:""
+						}
+					},
+					created:function () {
+						axios({
+							url:"user.do?op=getUser",
+						}).then((res)=>{
+							this.loginUser=res.data;
+							console.info(this.loginUser)
+						})
+					},
+					methods:{
+						logout(){
+							axios({
+								url:"user.do?op=logout"
+							}).then((res)=>{
+								alert(res.data.msg)
+								if (res.data.code){
+									 location.href="login.html";
+								}
+							})
+						}
+					}
+				})
+			</script>
+		</div>
+		<div class="cart">
+			<a  href="cart.html">购物车</a>
+		</div>
+			<div class="phone">
+				客服热线:
+				<strong>96008/53277764</strong>
+			</div>
+	</div>
+	
+
+	<!-- 顶部的导航 -->
+	<div id="mainNav" class="span24">
+		<ul class="mainNav">
+			<li>
+				<a href="index.html">首页</a>|
+		    </li>
+					
+			<li v-for="fc in firstCategory">
+				<a @click="switchCategory(fc.id)" >{{fc.cname}}</a>|
+			</li>
+					
+		</ul>
+	</div>
+	<!-- 顶部的结束 -->
+	
+	<script type="text/javascript">
+		var vue2=new Vue({
+			el:"#mainNav",
+			data:{
+				firstCategory:[], //顶部的一级分类导航 
+			},
+			created:function(){
+				var url="category.do";
+				//查询一级分类导航
+				axios({
+					method:'get',
+					params:{
+						op:'queryByFirstCat'
+					},
+					url:url
+					
+				}).then(res=>{
+					this.firstCategory=res.data.list;
+					console.info(this.firstCategory);
+				});
+			},
+			methods:{
+				switchCategory(id){
+					location.href= 'clist.html#'+id;
+				}
+			}
+		});
+	</script>
+
+
+</div>	
+<!-- header结束 -->
+
+<!--轮播图-->
+<!-- Swiper -->
+<div class="swiper-container">
+	<div class="swiper-wrapper" >
+		<div class="swiper-slide">
+			<a href="https://yixiangliying.tmall.com/p/rd215513.htm?spm=a220o.1000855.w5003-21724265479.3.7dfb6ddccjtd1N&scene=taobao_shop">
+			<img src="products/1/lunbo01.jpg" src="" height="100%" width="100%"></a>
+		</div>
+		<div class="swiper-slide">
+			<a href="https://mst.vip.com/HEYn521uBZgXETg_vJR2Ew.php?wapid=mst_100022588&_src=mst&extra_banner=0&nova=1&nova_platform=2&mst_page_type=guide&adidx=2&f=ad&adp=1318&adid=925945&scene_entry_id=-99">
+			<img src="products/1/lunbo05.jpg" height="100%" width="100%">
+			</a>
+		</div>
+		<div class="swiper-slide">
+			<a href="https://dior.tmall.com/index.htm?ali_trackid=41_aa8c862dd23bcfbf6334ab4fb90adaec">
+			<img src="products/1/lunbo02.jpg" height="100%" width="100%">
+			</a>
+		</div>
+		<div class="swiper-slide">
+			<a href="https://mst.vip.com/x9asHbFrQgCgTgWOks9-mA.php?wapid=mst_100021675&_src=mst&extra_banner=0&nova=1&nova_platform=2&mst_page_type=guide&adidx=1&f=ad&adp=1318&adid=925741&scene_entry_id=-99">
+			<img src="products/1/lunbo03.jpg" height="100%" width="100%">
+			</a>
+		</div>
+		<div class="swiper-slide">
+			<a href="https://yixiangliying.tmall.com/p/rd623653.htm?spm=a220o.1000855.w5003-21724265479.1.7dfb6ddccjtd1N&scene=taobao_shop">
+			<img src="products/1/lunbo04.jpg"  height="100%" width="100%"></a>
+		</div>
+
+	</div>
+	<!-- Add Pagination -->
+	<div class="swiper-pagination"></div>
+	<!-- Add Arrows -->
+	<div class="swiper-button-next"></div>
+	<div class="swiper-button-prev"></div>
+</div>
+<!-- Initialize Swiper -->
+<script>
+	var swiper = new Swiper('.swiper-container', {
+		spaceBetween: 30,
+		centeredSlides: true,
+		effect : 'fade',
+		autoplay: {
+			delay: 2500,//停顿时长
+			disableOnInteraction: false,
+			reverseDirections: true,//反向轮播
+		},
+		pagination: {//小圆点
+			el: '.swiper-pagination',
+			clickable: true,
+		},
+		navigation: {
+			nextEl: '.swiper-button-next',
+			prevEl: '.swiper-button-prev',
+		},
+	});
+</script>
+
+
+<div id="indexdiv" class="container index">
+		
+		<!-- 热销商品开始-->
+		<div class="span24">
+			<div id="hotProduct" class="hotProduct clearfix">
+					<div class="title">
+						<strong>热门商品</strong>
+						<!-- <a  target="_blank"></a> -->
+					</div>
+					<ul class="tab">
+							<li class="current">
+								<a href="./蔬菜分类.htm?tagIds=1" target="_blank"></a>
+							</li>
+							<li>
+								<a  target="_blank"></a>
+							</li>
+							<li>
+								<a target="_blank"></a>
+							</li>
+					</ul>
+						<ul class="tabContent" style="display: block;">
+							
+							<li v-for="h in hotList">
+								<a target="_blank" :href=" 'detail.html?'+h.id">
+								<img v-lazy="h.image" style="display: block;"></a>
+							</li>
+							
+						</ul>
+			</div>
+		</div>
+		<!-- 热销商品结束 -->
+		
+		<!-- 最新商品开始 -->
+		<div class="span24">
+			<div id="newProduct" class="newProduct clearfix">
+					<div class="title">
+						<strong>最新商品</strong>
+						<a  target="_blank"></a>
+					</div>
+					<ul class="tab">
+							<li class="current">
+								<a href="./蔬菜分类.htm?tagIds=2" target="_blank"></a>
+							</li>
+							<li>
+								<a  target="_blank"></a>
+							</li>
+							<li>
+								<a target="_blank"></a>
+							</li>
+					</ul>				
+						 <ul class="tabContent" style="display: block;">
+							<li v-for="n in newList">
+								<a :href=" 'detail.html?' + n.id " target="_blank">
+								<img v-lazy=" n.image " style="display: block;"></a>
+							</li>
+						</ul>
+			</div>
+		</div>
+		<!-- 最新商品结束 -->
+		
+		<div class="span24">
+			<div class="friendLink">
+				<dl>
+					<dd>新手指南</dd>
+							<dd>
+								<a  target="_blank">支付方式</a>
+								|
+							</dd>
+							<dd>
+								<a  target="_blank">配送方式</a>
+								|
+							</dd>
+							<dd>
+								<a  target="_blank">售后服务</a>
+								|
+							</dd>
+							<dd>
+								<a  target="_blank">购物帮助</a>
+								|
+							</dd>
+							<dd>
+								<a  target="_blank">蔬菜卡</a>
+								|
+							</dd>
+							<dd>
+								<a  target="_blank">礼品卡</a>
+								|
+							</dd>
+							<dd>
+								<a target="_blank">银联卡</a>
+								|
+							</dd>
+							<dd>
+								<a  target="_blank">亿家卡</a>
+								|
+							</dd>
+							
+					<dd class="more">
+						<a >更多</a>
+					</dd>
+				</dl>
+			</div>
+		</div>
+</div>
+<script type="text/javascript">
+	Vue.use(VueLazyload,{ 
+		    error:'images/error.jpg',                    //报错时需要的图片
+			loading:'images/loading_icon.gif',   //加载时需要的图片
+			
+		}
+	);
+	var vue=new Vue({
+		el:"#indexdiv",
+		data:{
+			hotList:[],  //热门商品
+			newList:[],  //最新商品 
+			
+		},
+		created:function(){
+			//查询热卖商品
+			axios.get("product.do?op=queryHotProduct").then(res=>{
+				this.hotList=res.data.list;
+			});
+			
+			//查询最新商品
+			axios.get("product.do?op=queryNewProduct").then(res=>{
+				this.newList=res.data.list;
+			});
+		}
+	});
+</script>
+<div class="container footer">
+	<div class="span24">
+		<div class="footerAd">
+					<img src="image/footer.jpg" width="950" height="52" alt="我们的优势" title="我们的优势">
+</div>	</div>
+	<div class="span24">
+		<ul class="bottomNav">
+					<li>
+						<a>关于我们</a>
+						|
+					</li>
+					<li>
+						<a>联系我们</a>
+						|
+					</li>
+					<li>
+						<a>招贤纳士</a>
+						|
+					</li>
+					<li>
+						<a>法律声明</a>
+						|
+					</li>
+					<li>
+						<a>友情链接</a>
+						|
+					</li>
+					<li>
+						<a target="_blank">支付方式</a>
+						|
+					</li>
+					<li>
+						<a target="_blank">配送方式</a>
+						|
+					</li>
+					<li>
+						<a>服务声明</a>
+						|
+					</li>
+					<li>
+						<a>广告声明</a>
+						
+					</li>
+		</ul>
+	</div>
+	<div class="span24">
+		<div class="copyright">Copyright © 2005-2013 大麦商城 版权所有</div>
+	</div>
+</div>
+</body></html>
